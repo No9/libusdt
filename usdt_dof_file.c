@@ -64,10 +64,6 @@ load_dof(int fd, dof_helper_t *dh)
 
         ret = ioctl(fd, DTRACEHIOC_ADDDOF, dh);
 
-#ifdef __FreeBSD__
-        if (ret != -1)
-                ret = dh->gen;
-#endif
         return ret;
 }
 
@@ -182,6 +178,9 @@ usdt_dof_file_load(usdt_dof_file_t *file, const char *module)
 
         dh.dofhp_dof  = (uintptr_t)dof;
         dh.dofhp_addr = (uintptr_t)dof;
+#ifdef __FreeBSD__
+        dh.dofhp_pid = getpid();
+#endif
         (void) strncpy(dh.dofhp_mod, module, sizeof (dh.dofhp_mod));
 
         if ((fd = open(helper, O_RDWR)) < 0)
